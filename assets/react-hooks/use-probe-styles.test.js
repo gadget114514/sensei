@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
-import useThemeColors from './use-theme-colors';
+import useProbeStyles from './use-probe-styles';
 
-describe( 'useThemeColors', () => {
-	it( 'Should get the theme colors', () => {
+describe( 'useProbeStyles', () => {
+	it( 'Should get the probe styles', () => {
 		const TestComponent = () => {
-			const themeColors = useThemeColors();
+			const probeStyles = useProbeStyles();
 			return (
 				<>
 					<style>
@@ -16,8 +16,8 @@ describe( 'useThemeColors', () => {
 					<div
 						data-testid="styled-element"
 						style={ {
-							backgroundColor: themeColors.primaryColor,
-							color: themeColors.primaryContrastColor,
+							backgroundColor: probeStyles.primaryColor,
+							color: probeStyles.primaryContrastColor,
 						} }
 					/>
 				</>

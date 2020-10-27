@@ -3,17 +3,17 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 const { getComputedStyle } = window;
 
 /**
- * Theme colors hook.
+ * Probe styles hook.
  *
  * It adds elements to the DOM as a probe, and get the computed styles
  * the default expected properties.
  *
- * @return {Object} Theme default colors.
+ * @return {Object} Probe default styles.
  */
-const useThemeColors = () => {
-	const [ themeColors, setThemeColors ] = useState( {} );
+const useProbeStyles = () => {
+	const [ probeStyles, setProbeStyles ] = useState( {} );
 
-	const getProbeColors = useCallback( () => {
+	const getProbeStyles = useCallback( () => {
 		// Create temporary probe elements.
 		const editorStylesWrapperDiv = document.createElement( 'div' );
 		editorStylesWrapperDiv.className =
@@ -35,8 +35,8 @@ const useThemeColors = () => {
 		editorStylesWrapperDiv.appendChild( blockButtonDiv );
 		document.body.appendChild( editorStylesWrapperDiv );
 
-		// Save colors.
-		const probeColors = {
+		// Save styles.
+		const styles = {
 			primaryColor: getComputedStyle( buttonLinkDiv ).backgroundColor,
 			primaryContrastColor: getComputedStyle( buttonLinkDiv ).color,
 		};
@@ -44,14 +44,14 @@ const useThemeColors = () => {
 		// Remove probe.
 		document.body.removeChild( editorStylesWrapperDiv );
 
-		return probeColors;
+		return styles;
 	}, [] );
 
 	useEffect( () => {
-		setThemeColors( getProbeColors() );
-	}, [ getProbeColors ] );
+		setProbeStyles( getProbeStyles() );
+	}, [ getProbeStyles ] );
 
-	return themeColors;
+	return probeStyles;
 };
 
-export default useThemeColors;
+export default useProbeStyles;
