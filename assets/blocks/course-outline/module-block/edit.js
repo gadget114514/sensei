@@ -1,4 +1,8 @@
-import { InnerBlocks, RichText } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	RichText,
+	getColorClassName,
+} from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { useContext, useState } from '@wordpress/element';
@@ -27,6 +31,7 @@ import { useInsertLessonBlock } from './use-insert-lesson-block';
  * @param {string}   props.attributes.title       Module title.
  * @param {string}   props.attributes.description Module description.
  * @param {string}   props.attributes.blockStyle  Selected block style.
+ * @param {string}   props.colorSlugs             Color slugs.
  * @param {Object}   props.mainColor              Header main color.
  * @param {Object}   props.textColor              Header text color.
  * @param {Function} props.setAttributes          Block set attributes function.
@@ -36,6 +41,7 @@ export const EditModuleBlock = ( props ) => {
 		clientId,
 		className,
 		attributes: { title, description },
+		colorSlugs,
 		mainColor,
 		textColor,
 		setAttributes,
@@ -72,12 +78,22 @@ export const EditModuleBlock = ( props ) => {
 		minimal: { borderColor: mainColor?.color },
 	}[ blockStyle ];
 
+	const backgroundClassName =
+		colorSlugs?.primaryColor &&
+		getColorClassName( 'background-color', colorSlugs?.primaryColor );
+
 	return (
 		<>
 			<ModuleBlockSettings { ...props } />
 			<section className={ className }>
 				<header
-					className="wp-block-sensei-lms-course-outline-module__header"
+					className={ classnames(
+						'wp-block-sensei-lms-course-outline-module__header',
+						{
+							'has-background-color': backgroundClassName,
+							[ backgroundClassName ]: backgroundClassName,
+						}
+					) }
 					style={ { ...blockStyleColors, color: textColor?.color } }
 				>
 					<h2 className="wp-block-sensei-lms-course-outline-module__title">
