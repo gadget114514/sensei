@@ -5,7 +5,34 @@ import {
 	withColors,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { mapValues, upperFirst } from 'lodash';
+import { useSelect } from '@wordpress/data';
+import { mapValues, keyBy, upperFirst } from 'lodash';
+
+import { hexToRGB } from '../helpers/colors';
+import useProbeStyles from '../../react-hooks/use-probe-styles';
+
+/**
+ * Hook to get theme slugs.
+ */
+const useThemeColorSlugs = () => {
+	const themePaletteColors = useSelect(
+		( select ) => select( 'core/editor' ).getEditorSettings().colors,
+		[]
+	);
+	const slugsByColor = mapValues(
+		keyBy( themePaletteColors, ( item ) => hexToRGB( item.color ) ),
+		'slug'
+	);
+
+	const probeStyles = useProbeStyles();
+	const colorSlugs = {};
+
+	Object.entries( probeStyles ).forEach( ( [ key, color ] ) => {
+		colorSlugs[ key ] = slugsByColor[ hexToRGB( color ) ];
+	} );
+
+	return colorSlugs;
+};
 
 /**
  * Add color customization support and block settings controls for colors.
@@ -14,12 +41,16 @@ import { mapValues, upperFirst } from 'lodash';
  */
 export const withColorSettings = ( colorSettings ) => {
 	return ( Component ) => {
-		const ComponentWithColorSettings = ( props ) => (
-			<>
-				<Component { ...props } />
-				<ColorSettings { ...{ colorSettings, props } } />
-			</>
-		);
+		const ComponentWithColorSettings = ( props ) => {
+			const colorSlugs = useThemeColorSlugs( colorSettings );
+
+			return (
+				<>
+					<Component { ...props } colorSlugs={ colorSlugs } />
+					<ColorSettings { ...{ colorSettings, props } } />
+				</>
+			);
+		};
 
 		const colors = mapValues(
 			colorSettings,
