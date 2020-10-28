@@ -26,6 +26,11 @@ $dark-gray: #1a1d20;
 
 		&__title-input {
 			background: none;
+
+			&::placeholder {
+				color: inherit;
+				opacity: 0.5;
+			}
 		}
 	}
 
