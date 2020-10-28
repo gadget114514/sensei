@@ -1,11 +1,7 @@
-import {
-	InnerBlocks,
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, RichText } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { useContext, useState } from '@wordpress/element';
+import { useContext, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import AnimateHeight from 'react-animate-height';
@@ -20,6 +16,21 @@ import SingleLineInput from '../single-line-input';
 import { ModuleStatus } from './module-status';
 import { ModuleBlockSettings } from './settings';
 import { useInsertLessonBlock } from './use-insert-lesson-block';
+
+const useDefaultColor = (
+	currentColor,
+	attributeKey,
+	defaultColor,
+	setAttributes
+) => {
+	useEffect( () => {
+		if ( ! currentColor ) {
+			setAttributes( {
+				[ attributeKey ]: defaultColor ? defaultColor : undefined,
+			} );
+		}
+	}, [ currentColor, attributeKey, defaultColor, setAttributes ] );
+};
 
 /**
  * Edit module block component.
@@ -53,6 +64,19 @@ export const EditModuleBlock = ( props ) => {
 
 	useInsertLessonBlock( props );
 
+	useDefaultColor(
+		mainColor?.color,
+		'mainColor',
+		colorSlugs?.primaryColor,
+		setAttributes
+	);
+	useDefaultColor(
+		textColor?.color,
+		'textColor',
+		colorSlugs?.primaryContrastColor,
+		setAttributes
+	);
+
 	/**
 	 * Handle update name.
 	 *
@@ -78,22 +102,12 @@ export const EditModuleBlock = ( props ) => {
 		minimal: { borderColor: mainColor?.color },
 	}[ blockStyle ];
 
-	const backgroundClassName =
-		colorSlugs?.primaryColor &&
-		getColorClassName( 'background-color', colorSlugs?.primaryColor );
-
 	return (
 		<>
 			<ModuleBlockSettings { ...props } />
 			<section className={ className }>
 				<header
-					className={ classnames(
-						'wp-block-sensei-lms-course-outline-module__header',
-						{
-							'has-background-color': backgroundClassName,
-							[ backgroundClassName ]: backgroundClassName,
-						}
-					) }
+					className="wp-block-sensei-lms-course-outline-module__header"
 					style={ { ...blockStyleColors, color: textColor?.color } }
 				>
 					<h2 className="wp-block-sensei-lms-course-outline-module__title">
