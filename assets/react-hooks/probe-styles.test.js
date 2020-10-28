@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react';
-import useProbeStyles from './use-probe-styles';
+import useProbeStyles from './probe-styles';
 
 describe( 'useProbeStyles', () => {
 	it( 'Should get the probe styles', () => {

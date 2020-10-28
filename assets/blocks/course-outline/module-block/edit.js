@@ -1,7 +1,7 @@
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
-import { useContext, useState, useEffect } from '@wordpress/element';
+import { useContext, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import AnimateHeight from 'react-animate-height';
@@ -11,26 +11,12 @@ import {
 	withColorSettings,
 	withDefaultBlockStyle,
 } from '../../../shared/blocks/settings';
+import { useDefaultColor } from '../../../react-hooks/probe-styles';
 import { OutlineAttributesContext } from '../course-block/edit';
 import SingleLineInput from '../single-line-input';
 import { ModuleStatus } from './module-status';
 import { ModuleBlockSettings } from './settings';
 import { useInsertLessonBlock } from './use-insert-lesson-block';
-
-const useDefaultColor = (
-	currentColor,
-	attributeKey,
-	defaultColor,
-	setAttributes
-) => {
-	useEffect( () => {
-		if ( ! currentColor ) {
-			setAttributes( {
-				[ attributeKey ]: defaultColor ? defaultColor : undefined,
-			} );
-		}
-	}, [ currentColor, attributeKey, defaultColor, setAttributes ] );
-};
 
 /**
  * Edit module block component.
@@ -42,7 +28,6 @@ const useDefaultColor = (
  * @param {string}   props.attributes.title       Module title.
  * @param {string}   props.attributes.description Module description.
  * @param {string}   props.attributes.blockStyle  Selected block style.
- * @param {string}   props.colorSlugs             Color slugs.
  * @param {Object}   props.mainColor              Header main color.
  * @param {Object}   props.textColor              Header text color.
  * @param {Function} props.setAttributes          Block set attributes function.
@@ -52,7 +37,6 @@ export const EditModuleBlock = ( props ) => {
 		clientId,
 		className,
 		attributes: { title, description },
-		colorSlugs,
 		mainColor,
 		textColor,
 		setAttributes,
@@ -67,13 +51,13 @@ export const EditModuleBlock = ( props ) => {
 	useDefaultColor(
 		mainColor?.color,
 		'mainColor',
-		colorSlugs?.primaryColor,
+		'primaryColor',
 		setAttributes
 	);
 	useDefaultColor(
 		textColor?.color,
 		'textColor',
-		colorSlugs?.primaryContrastColor,
+		'primaryContrastColor',
 		setAttributes
 	);
 
