@@ -1,7 +1,9 @@
-import { withColorSettings } from '../../shared/blocks/settings';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import { useSelect } from '@wordpress/data';
+
+import { withColorSettings } from '../../shared/blocks/settings';
+import { useDefaultColor } from '../../react-hooks/probe-styles';
 import { COURSE_STATUS_STORE } from '../course-outline/status-store';
 import { CourseProgressSettings } from './settings';
 
@@ -29,6 +31,13 @@ export const EditCourseProgressBlock = ( {
 	const { totalLessonsCount, completedLessonsCount } = useSelect(
 		( select ) => select( COURSE_STATUS_STORE ).getLessonCounts(),
 		[]
+	);
+
+	useDefaultColor(
+		barColor?.color,
+		'barColor',
+		'primaryColor',
+		setAttributes
 	);
 
 	let progress = 0;
