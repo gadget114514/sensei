@@ -2,7 +2,6 @@ import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import { useSelect } from '@wordpress/data';
-import { getColorClassName } from '@wordpress/block-editor';
 
 import {
 	withColorSettings,
@@ -14,23 +13,24 @@ import { CourseProgressSettings } from './settings';
 /**
  * Edit course progress bar component.
  *
- * @param {Object}   props                            Component properties.
- * @param {string}   props.className                  Custom class name.
- * @param {Object}   props.barColor                   Color object for the progress bar.
- * @param {Object}   props.barBackgroundColor         Color object for the background of the progress bar.
- * @param {Object}   props.textColor                  Color object for the text.
- * @param {Object}   props.attributes                 Component attributes.
- * @param {number}   props.attributes.height          The height of the progress bar.
- * @param {number}   props.attributes.borderRadius    The border radius of the progress bar.
- * @param {number}   props.attributes.defaultBarColor The border radius of the progress bar.
- * @param {Function} props.setAttributes              Callback to set the component attributes.
+ * @param {Object}   props                         Component properties.
+ * @param {string}   props.className               Custom class name.
+ * @param {Object}   props.barColor                Color object for the progress bar.
+ * @param {Object}   props.defaultBarColor         Default bar color.
+ * @param {Object}   props.barBackgroundColor      Color object for the background of the progress bar.
+ * @param {Object}   props.textColor               Color object for the text.
+ * @param {Object}   props.attributes              Component attributes.
+ * @param {number}   props.attributes.height       The height of the progress bar.
+ * @param {number}   props.attributes.borderRadius The border radius of the progress bar.
+ * @param {Function} props.setAttributes           Callback to set the component attributes.
  */
 export const EditCourseProgressBlock = ( {
 	className,
 	barColor,
+	defaultBarColor,
 	barBackgroundColor,
 	textColor,
-	attributes: { height, borderRadius, defaultBarColor },
+	attributes: { height, borderRadius },
 	setAttributes,
 } ) => {
 	const { totalLessonsCount, completedLessonsCount } = useSelect(
@@ -55,9 +55,7 @@ export const EditCourseProgressBlock = ( {
 		},
 	};
 	const barAttributes = {
-		className:
-			barColor?.class ||
-			getColorClassName( 'background-color', defaultBarColor ),
+		className: barColor?.class || defaultBarColor?.className,
 		style: {
 			backgroundColor: barColor?.color,
 			width: Math.max( 3, progress ) + '%',
@@ -127,6 +125,9 @@ export default compose(
 		},
 	} ),
 	withDefaultColor( {
-		defaultBarColor: 'primaryColor',
+		defaultBarColor: {
+			style: 'background-color',
+			probeKey: 'primaryColor',
+		},
 	} )
 )( EditCourseProgressBlock );

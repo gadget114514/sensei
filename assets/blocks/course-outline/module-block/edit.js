@@ -1,8 +1,4 @@
-import {
-	InnerBlocks,
-	RichText,
-	getColorClassName,
-} from '@wordpress/block-editor';
+import { InnerBlocks, RichText } from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { useContext, useState } from '@wordpress/element';
@@ -33,16 +29,20 @@ import { useInsertLessonBlock } from './use-insert-lesson-block';
  * @param {string}   props.attributes.description Module description.
  * @param {string}   props.attributes.blockStyle  Selected block style.
  * @param {Object}   props.mainColor              Header main color.
+ * @param {Object}   props.defaultMainColor       Default main color.
  * @param {Object}   props.textColor              Header text color.
+ * @param {Object}   props.defaultTextColor       Default text color.
  * @param {Function} props.setAttributes          Block set attributes function.
  */
 export const EditModuleBlock = ( props ) => {
 	const {
 		clientId,
 		className,
-		attributes: { title, description, defaultMainColor, defaultTextColor },
+		attributes: { title, description },
 		mainColor,
+		defaultMainColor,
 		textColor,
+		defaultTextColor,
 		setAttributes,
 		blockStyle,
 	} = props;
@@ -72,33 +72,28 @@ export const EditModuleBlock = ( props ) => {
 
 	const [ isExpanded, setExpanded ] = useState( true );
 
-	const blockStyleColors = {
-		default: { background: mainColor?.color },
-		minimal: { borderColor: mainColor?.color },
-	}[ blockStyle ];
-
-	// console.log( getColorClassName( 'background-color', defaultMainColor ) );
-
+	// Header styles.
 	const headerClassNames = classnames(
 		'wp-block-sensei-lms-course-outline-module__header',
 		{
-			[ getColorClassName( 'background-color', defaultMainColor ) ]:
+			[ defaultMainColor?.className ]:
 				! mainColor?.color && 'minimal' !== blockStyle,
-			[ getColorClassName( 'color', defaultTextColor ) ]:
+			[ defaultTextColor?.className ]:
 				! textColor?.color && 'minimal' !== blockStyle,
 		}
 	);
+	const headerStyles = {
+		...( 'default' === blockStyle && { background: mainColor?.color } ),
+		color: textColor?.color,
+	};
 
+	// Minimal border styles.
 	let minimalBorder;
-
 	if ( 'minimal' === blockStyle ) {
 		const borderClassNames = classnames(
 			'wp-block-sensei-lms-course-outline-module__name__minimal-border',
 			{
-				[ getColorClassName(
-					'background-color',
-					defaultMainColor
-				) ]: ! mainColor?.color,
+				[ defaultMainColor?.className ]: ! mainColor?.color,
 			}
 		);
 		const borderStyles = { background: mainColor?.color };
@@ -112,10 +107,7 @@ export const EditModuleBlock = ( props ) => {
 		<>
 			<ModuleBlockSettings { ...props } />
 			<section className={ className }>
-				<header
-					className={ headerClassNames }
-					style={ { ...blockStyleColors, color: textColor?.color } }
-				>
+				<header className={ headerClassNames } style={ headerStyles }>
 					<h2 className="wp-block-sensei-lms-course-outline-module__title">
 						<SingleLineInput
 							className="wp-block-sensei-lms-course-outline-module__title-input"
@@ -183,7 +175,13 @@ export default compose(
 	} ),
 	withDefaultBlockStyle(),
 	withDefaultColor( {
-		defaultMainColor: 'primaryColor',
-		defaultTextColor: 'primaryContrastColor',
+		defaultMainColor: {
+			style: 'background-color',
+			probeKey: 'primaryColor',
+		},
+		defaultTextColor: {
+			style: 'color',
+			probeKey: 'primaryContrastColor',
+		},
 	} )
 )( EditModuleBlock );

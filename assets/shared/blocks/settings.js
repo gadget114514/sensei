@@ -1,9 +1,10 @@
-import { useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	ContrastChecker,
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
+	getColorClassName,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { mapValues, upperFirst } from 'lodash';
@@ -93,36 +94,55 @@ export const withDefaultBlockStyle = () => ( Component ) => ( props ) => {
 /**
  * This HOC sets the default color attribute to a value based in a probe.
  *
- * @param {Object} colorsConfig Colors config object, where the key is the
+ * @param {Object} colorConfigs Colors config object, where the key is the
  *                              default color attribute name, and the value is
- *                              the probe key.
+ *                              an object containing style and probeKey.
  *                              The block attributes must register an attribute
  *                              for every key.
  *
  * @return {Function} Extended component.
  */
-export const withDefaultColor = ( colorsConfig ) => ( Component ) => (
+export const withDefaultColor = ( colorConfigs ) => ( Component ) => (
 	props
 ) => {
 	const { setAttributes, attributes } = props;
 	const colorSlugsByProbe = useColorSlugsByProbe();
+	const [ colorProps, setColorProps ] = useState( {} );
 
-	const colorDeps = Object.keys( colorsConfig ).map(
+	const colorConfigsDeps = Object.keys( colorConfigs ).map(
 		( key ) => attributes[ key ]
 	);
 
 	useEffect( () => {
-		Object.entries( colorsConfig ).forEach( ( [ colorKey, probeKey ] ) => {
-			const probeColorSlug = colorSlugsByProbe[ probeKey ];
+		const newColorProps = {};
 
-			if ( probeColorSlug && attributes[ colorKey ] !== probeColorSlug ) {
-				setAttributes( {
-					[ colorKey ]: probeColorSlug,
-				} );
+		Object.entries( colorConfigs ).forEach(
+			( [ colorKey, { style, probeKey } ] ) => {
+				const probeColorSlug = colorSlugsByProbe[ probeKey ];
+
+				newColorProps[ colorKey ] = {
+					slug: attributes[ colorKey ],
+					className: getColorClassName(
+						style,
+						attributes[ colorKey ]
+					),
+				};
+
+				if (
+					probeColorSlug &&
+					attributes[ colorKey ] !== probeColorSlug
+				) {
+					setAttributes( {
+						[ colorKey ]: probeColorSlug,
+					} );
+				}
 			}
-		} );
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- The deps are added dynamically because we get it dynamically from the attributes and we don't want add all attributes as dep.
-	}, [ colorSlugsByProbe, setAttributes, ...colorDeps ] );
+		);
 
-	return <Component { ...props } />;
+		setColorProps( newColorProps );
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- The deps are added dynamically because we get it dynamically from the attributes and we don't want add all attributes as dep.
+	}, [ colorSlugsByProbe, setAttributes, ...colorConfigsDeps ] );
+
+	return <Component { ...props } { ...colorProps } />;
 };
