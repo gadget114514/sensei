@@ -10,8 +10,8 @@ import { chevronUp } from '../../../icons/wordpress-icons';
 import {
 	withColorSettings,
 	withDefaultBlockStyle,
+	withDefaultColor,
 } from '../../../shared/blocks/settings';
-import { useDefaultColor } from '../../../react-hooks/probe-styles';
 import { OutlineAttributesContext } from '../course-block/edit';
 import SingleLineInput from '../single-line-input';
 import { ModuleStatus } from './module-status';
@@ -47,19 +47,6 @@ export const EditModuleBlock = ( props ) => {
 	} = useContext( OutlineAttributesContext ) || { outlineAttributes: {} };
 
 	useInsertLessonBlock( props );
-
-	useDefaultColor(
-		mainColor?.color,
-		'mainColor',
-		'primaryColor',
-		setAttributes
-	);
-	useDefaultColor(
-		textColor?.color,
-		'textColor',
-		'primaryContrastColor',
-		setAttributes
-	);
 
 	/**
 	 * Handle update name.
@@ -158,5 +145,9 @@ export default compose(
 		},
 		textColor: { style: 'color', label: __( 'Text color', 'sensei-lms' ) },
 	} ),
-	withDefaultBlockStyle()
+	withDefaultBlockStyle(),
+	withDefaultColor( {
+		defaultMainColor: 'primaryColor',
+		defaultTextColor: 'primaryContrastColor',
+	} )
 )( EditModuleBlock );

@@ -11,7 +11,7 @@ const { getComputedStyle } = window;
  *
  * @return {Object} Object containing the color slugs, where the key is the probe key.
  */
-const useColorSlugsByProbe = () => {
+export const useColorSlugsByProbe = () => {
 	const themeColorPalette = useSelect(
 		( select ) => select( 'core/editor' ).getEditorSettings().colors,
 		[]
@@ -38,40 +38,6 @@ const useColorSlugsByProbe = () => {
 	}, [ themeColorPalette, probeStyles ] );
 
 	return colorSlugsByProbe;
-};
-
-/**
- * Hook to set the default color attribute in a block, based on the theme
- * colors and the probe.
- *
- * @param {string}   currentColor  Current color.
- * @param {string}   attributeKey  Attribute key where the color is saved.
- * @param {string}   probeKey      Probe key to get the desired color.
- * @param {Function} setAttributes Set attributes function.
- */
-export const useDefaultColor = (
-	currentColor,
-	attributeKey,
-	probeKey,
-	setAttributes
-) => {
-	const colorSlugsByProbe = useColorSlugsByProbe();
-
-	useEffect( () => {
-		const defaultColor = colorSlugsByProbe[ probeKey ];
-
-		if ( ! currentColor ) {
-			setAttributes( {
-				[ attributeKey ]: defaultColor ? defaultColor : undefined,
-			} );
-		}
-	}, [
-		currentColor,
-		attributeKey,
-		probeKey,
-		setAttributes,
-		colorSlugsByProbe,
-	] );
 };
 
 /**

@@ -1,3 +1,4 @@
+import { useEffect } from '@wordpress/element';
 import {
 	ContrastChecker,
 	InspectorControls,
@@ -6,6 +7,8 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { mapValues, upperFirst } from 'lodash';
+
+import { useColorSlugsByProbe } from '../../react-hooks/probe-styles';
 
 /**
  * Add color customization support and block settings controls for colors.
@@ -85,4 +88,41 @@ export const withDefaultBlockStyle = () => ( Component ) => ( props ) => {
 	if ( style ) extraProps.blockStyle = style[ 1 ];
 
 	return <Component { ...props } { ...extraProps } />;
+};
+
+/**
+ * This HOC sets the default color attribute to a value based in a probe.
+ *
+ * @param {Object} colorsConfig Colors config object, where the key is the
+ *                              default color attribute name, and the value is
+ *                              the probe key.
+ *                              The block attributes must register an attribute
+ *                              for every key.
+ *
+ * @return {Function} Extended component.
+ */
+export const withDefaultColor = ( colorsConfig ) => ( Component ) => (
+	props
+) => {
+	const { setAttributes, attributes } = props;
+	const colorSlugsByProbe = useColorSlugsByProbe();
+
+	const colorDeps = Object.keys( colorsConfig ).map(
+		( key ) => attributes[ key ]
+	);
+
+	useEffect( () => {
+		Object.entries( colorsConfig ).forEach( ( [ colorKey, probeKey ] ) => {
+			const probeColorSlug = colorSlugsByProbe[ probeKey ];
+
+			if ( probeColorSlug && attributes[ colorKey ] !== probeColorSlug ) {
+				setAttributes( {
+					[ colorKey ]: probeColorSlug,
+				} );
+			}
+		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- The deps are added dynamically because we get it dynamically from the attributes and we don't want add all attributes as dep.
+	}, [ colorSlugsByProbe, setAttributes, ...colorDeps ] );
+
+	return <Component { ...props } />;
 };
