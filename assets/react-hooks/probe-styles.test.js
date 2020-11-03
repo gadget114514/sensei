@@ -1,35 +1,21 @@
-import { render } from '@testing-library/react';
-import useProbeStyles from './probe-styles';
+import { getProbeStyles } from './probe-styles';
 
-describe( 'useProbeStyles', () => {
+describe( 'getProbeStyles', () => {
 	it( 'Should get the probe styles', () => {
-		const TestComponent = () => {
-			const probeStyles = useProbeStyles();
-			return (
-				<>
-					<style>
-						{ `.wp-block-button__link {
-							background-color: rgb(0, 0, 0);
-							color: rgb(255, 255, 255);
-						}` }
-					</style>
-					<div
-						data-testid="styled-element"
-						style={ {
-							backgroundColor: probeStyles.primaryColor,
-							color: probeStyles.primaryContrastColor,
-						} }
-					/>
-				</>
-			);
-		};
+		const styles = `.wp-block-button__link {
+			background-color: rgb(0, 0, 0);
+			color: rgb(255, 255, 255);
+		}`;
 
-		const { getByTestId } = render( <TestComponent /> );
+		const style = document.createElement( 'style' );
+		style.appendChild( document.createTextNode( styles ) );
 
-		expect( getByTestId( 'styled-element' ).style.backgroundColor ).toEqual(
-			'rgb(0, 0, 0)'
-		);
-		expect( getByTestId( 'styled-element' ).style.color ).toEqual(
+		document.head.appendChild( style );
+
+		const probeStyles = getProbeStyles();
+
+		expect( probeStyles.primaryColor ).toEqual( 'rgb(0, 0, 0)' );
+		expect( probeStyles.primaryContrastColor ).toEqual(
 			'rgb(255, 255, 255)'
 		);
 	} );
