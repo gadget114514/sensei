@@ -1,12 +1,16 @@
-import { InnerBlocks, RichText } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	RichText,
+	getColorClassName,
+} from '@wordpress/block-editor';
 import { Icon } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { useContext, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 import AnimateHeight from 'react-animate-height';
-import { chevronUp } from '../../../icons/wordpress-icons';
 
+import { chevronUp } from '../../../icons/wordpress-icons';
 import {
 	withColorSettings,
 	withDefaultBlockStyle,
@@ -36,7 +40,7 @@ export const EditModuleBlock = ( props ) => {
 	const {
 		clientId,
 		className,
-		attributes: { title, description },
+		attributes: { title, description, defaultMainColor, defaultTextColor },
 		mainColor,
 		textColor,
 		setAttributes,
@@ -73,12 +77,43 @@ export const EditModuleBlock = ( props ) => {
 		minimal: { borderColor: mainColor?.color },
 	}[ blockStyle ];
 
+	// console.log( getColorClassName( 'background-color', defaultMainColor ) );
+
+	const headerClassNames = classnames(
+		'wp-block-sensei-lms-course-outline-module__header',
+		{
+			[ getColorClassName( 'background-color', defaultMainColor ) ]:
+				! mainColor?.color && 'minimal' !== blockStyle,
+			[ getColorClassName( 'color', defaultTextColor ) ]:
+				! textColor?.color && 'minimal' !== blockStyle,
+		}
+	);
+
+	let minimalBorder;
+
+	if ( 'minimal' === blockStyle ) {
+		const borderClassNames = classnames(
+			'wp-block-sensei-lms-course-outline-module__name__minimal-border',
+			{
+				[ getColorClassName(
+					'background-color',
+					defaultMainColor
+				) ]: ! mainColor?.color,
+			}
+		);
+		const borderStyles = { background: mainColor?.color };
+
+		minimalBorder = (
+			<div className={ borderClassNames } style={ borderStyles } />
+		);
+	}
+
 	return (
 		<>
 			<ModuleBlockSettings { ...props } />
 			<section className={ className }>
 				<header
-					className="wp-block-sensei-lms-course-outline-module__header"
+					className={ headerClassNames }
 					style={ { ...blockStyleColors, color: textColor?.color } }
 				>
 					<h2 className="wp-block-sensei-lms-course-outline-module__title">
@@ -106,6 +141,7 @@ export const EditModuleBlock = ( props ) => {
 						</button>
 					) }
 				</header>
+				{ minimalBorder }
 				<AnimateHeight
 					className="wp-block-sensei-lms-collapsible"
 					duration={ 500 }
