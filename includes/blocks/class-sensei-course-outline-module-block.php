@@ -37,7 +37,7 @@ class Sensei_Course_Outline_Module_Block {
 
 		$header_css = [];
 		if (
-			! $is_minimal_style
+			$is_default_style
 			|| ! empty( $block['attributes']['textColor'] )
 			|| ! empty( $block['attributes']['customTextColor'] )
 		) {
