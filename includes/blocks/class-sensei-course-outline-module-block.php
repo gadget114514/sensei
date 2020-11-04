@@ -35,17 +35,22 @@ class Sensei_Course_Outline_Module_Block {
 		$is_default_style = false !== strpos( $class_name, 'is-style-default' );
 		$is_minimal_style = false !== strpos( $class_name, 'is-style-minimal' );
 
-		$header_css = Sensei_Block_Helpers::build_styles(
-			$block['attributes'],
-			[
-				'mainColor' => $is_default_style ? 'background-color' : null,
-			]
-		);
+		$header_css = [];
+		if (
+			! $is_minimal_style
+			|| ! empty( $block['attributes']['textColor'] )
+			|| ! empty( $block['attributes']['customTextColor'] )
+		) {
+			$header_css = Sensei_Block_Helpers::build_styles(
+				$block['attributes'],
+				[
+					'mainColor' => $is_default_style ? 'background-color' : null,
+				]
+			);
+		}
 
 		$style_header = '';
-
 		if ( $is_minimal_style ) {
-
 			$header_border_css = Sensei_Block_Helpers::build_styles(
 				$block['attributes'],
 				[
@@ -54,7 +59,6 @@ class Sensei_Course_Outline_Module_Block {
 			);
 
 			$style_header = '<div ' . Sensei_Block_Helpers::render_style_attributes( 'wp-block-sensei-lms-course-outline-module__name__minimal-border', $header_border_css ) . '></div>';
-
 		}
 
 		$title       = esc_html( $block['title'] );
