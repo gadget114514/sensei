@@ -9,7 +9,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { mapValues, upperFirst } from 'lodash';
 
-import { useColorSlugsByProbe } from '../../react-hooks/probe-styles';
+import { useColorsByProbe } from '../../react-hooks/probe-styles';
 
 /**
  * Add color customization support and block settings controls for colors.
@@ -106,11 +106,11 @@ export const withDefaultColor = ( colorConfigs ) => ( Component ) => (
 	props
 ) => {
 	const { setAttributes, attributes } = props;
-	const colorSlugsByProbe = useColorSlugsByProbe();
+	const colorsByProbe = useColorsByProbe();
 	const [ colorProps, setColorProps ] = useState( {} );
 
 	const colorConfigsDeps = Object.keys( colorConfigs ).map(
-		( key ) => attributes[ key ]
+		( colorKey ) => attributes[ colorKey ]
 	);
 
 	useEffect( () => {
@@ -118,22 +118,19 @@ export const withDefaultColor = ( colorConfigs ) => ( Component ) => (
 
 		Object.entries( colorConfigs ).forEach(
 			( [ colorKey, { style, probeKey } ] ) => {
-				const probeColorSlug = colorSlugsByProbe[ probeKey ];
+				const probeColor = colorsByProbe[ probeKey ] || {};
+				const { slug } = probeColor;
 
-				newColorProps[ colorKey ] = {
-					slug: attributes[ colorKey ],
-					className: getColorClassName(
-						style,
-						attributes[ colorKey ]
-					),
-				};
+				if ( slug ) {
+					newColorProps[ colorKey ] = {
+						...probeColor,
+						className: getColorClassName( style, slug ),
+					};
+				}
 
-				if (
-					probeColorSlug &&
-					attributes[ colorKey ] !== probeColorSlug
-				) {
+				if ( attributes[ colorKey ] !== slug ) {
 					setAttributes( {
-						[ colorKey ]: probeColorSlug,
+						[ colorKey ]: slug,
 					} );
 				}
 			}
@@ -142,7 +139,7 @@ export const withDefaultColor = ( colorConfigs ) => ( Component ) => (
 		setColorProps( newColorProps );
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps -- The deps are added dynamically because we get it dynamically from the attributes and we don't want add all attributes as dep.
-	}, [ colorSlugsByProbe, setAttributes, ...colorConfigsDeps ] );
+	}, [ colorsByProbe, setAttributes, ...colorConfigsDeps ] );
 
 	return <Component { ...props } { ...colorProps } />;
 };

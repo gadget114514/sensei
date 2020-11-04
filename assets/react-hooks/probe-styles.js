@@ -7,11 +7,11 @@ import { hexToRGB } from '../shared/helpers/colors';
 const { getComputedStyle } = window;
 
 /**
- * Get color slugs by probe.
+ * Get color object by probe.
  *
- * @return {Object} Object containing the color slugs, where the key is the probe key.
+ * @return {Object} Object containing the color objects, where the key is the probe key.
  */
-export const useColorSlugsByProbe = () => {
+export const useColorsByProbe = () => {
 	const themeColorPalette = useSelect(
 		( select ) => select( 'core/editor' ).getEditorSettings().colors,
 		[]
@@ -27,10 +27,10 @@ export const useColorSlugsByProbe = () => {
 		);
 
 		Object.entries( probeStyles ).forEach( ( [ key, color ] ) => {
-			const colorSlug = slugsByColor[ hexToRGB( color ) ];
+			const slug = slugsByColor[ hexToRGB( color ) ];
 
-			if ( colorSlug ) {
-				newState[ key ] = colorSlug;
+			if ( slug ) {
+				newState[ key ] = { slug, color };
 			}
 		} );
 

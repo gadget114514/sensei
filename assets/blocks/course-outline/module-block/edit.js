@@ -73,33 +73,27 @@ export const EditModuleBlock = ( props ) => {
 	const [ isExpanded, setExpanded ] = useState( true );
 
 	// Header styles.
-	const headerClassNames = classnames(
-		'wp-block-sensei-lms-course-outline-module__header',
-		{
-			[ defaultMainColor?.className ]:
-				! mainColor?.color && 'minimal' !== blockStyle,
-			[ defaultTextColor?.className ]:
-				! textColor?.color && 'minimal' !== blockStyle,
-		}
-	);
 	const headerStyles = {
-		...( 'default' === blockStyle && { background: mainColor?.color } ),
-		color: textColor?.color,
+		...( 'default' === blockStyle && {
+			background: mainColor?.color || defaultMainColor?.color,
+		} ),
+		color:
+			textColor?.color ||
+			( 'default' === blockStyle ? defaultTextColor?.color : undefined ),
 	};
 
 	// Minimal border styles.
 	let minimalBorder;
 	if ( 'minimal' === blockStyle ) {
-		const borderClassNames = classnames(
-			'wp-block-sensei-lms-course-outline-module__name__minimal-border',
-			{
-				[ defaultMainColor?.className ]: ! mainColor?.color,
-			}
-		);
-		const borderStyles = { background: mainColor?.color };
+		const borderStyles = {
+			background: mainColor?.color || defaultMainColor?.color,
+		};
 
 		minimalBorder = (
-			<div className={ borderClassNames } style={ borderStyles } />
+			<div
+				className="wp-block-sensei-lms-course-outline-module__name__minimal-border"
+				style={ borderStyles }
+			/>
 		);
 	}
 
@@ -107,7 +101,10 @@ export const EditModuleBlock = ( props ) => {
 		<>
 			<ModuleBlockSettings { ...props } />
 			<section className={ className }>
-				<header className={ headerClassNames } style={ headerStyles }>
+				<header
+					className="wp-block-sensei-lms-course-outline-module__header"
+					style={ headerStyles }
+				>
 					<h2 className="wp-block-sensei-lms-course-outline-module__title">
 						<SingleLineInput
 							className="wp-block-sensei-lms-course-outline-module__title-input"
